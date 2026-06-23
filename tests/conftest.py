@@ -31,6 +31,7 @@ def engine_fixture():
             os.remove(db_file)
         except Exception:
             pass
+        
 
 @pytest.fixture(name="session")
 def session_fixture(engine):
