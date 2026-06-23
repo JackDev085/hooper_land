@@ -32,6 +32,7 @@ def engine_fixture():
         except Exception:
             pass
 
+
 @pytest.fixture(name="session")
 def session_fixture(engine):
     with Session(engine) as session:
