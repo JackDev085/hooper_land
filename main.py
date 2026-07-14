@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from core.database import create_db_and_tables, engine
 
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -47,7 +46,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.mount("/downloads", StaticFiles(directory="downloads"), name="downloads")
 app.include_router(login_router)
 app.include_router(workout_router)
 app.include_router(exercises_router)
