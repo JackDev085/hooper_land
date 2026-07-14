@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from models.users import User
-from schemas.users import UserCreate, UserPublic, UserUsername, UserUpdate, UserAdminUpdate, UserRanking
+from schemas.users import UserCreate, UserPublic, UserUsername, UserUpdate, UserAdminUpdate, UserRanking, UserSimple
 from core.security import get_current_user, require_admin
 from core.database import get_session
 from sqlmodel import Session
@@ -68,7 +68,7 @@ async def get_users_ranking(
     user_service = UserService(session)
     return user_service.get_users_ranking(limit)
 
-@router.get("/users", response_model=list[UserPublic])
+@router.get("/users", response_model=list[UserSimple])
 async def list_all_users(
     admin: User = Depends(require_admin),
     session: Session = Depends(get_session)

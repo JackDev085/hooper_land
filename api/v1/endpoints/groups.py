@@ -7,7 +7,7 @@ from models.users import User
 
 from repositories.groups_repository import GroupsRepository
 from repositories.dash_repository import DashRepository
-from schemas.users import UserPublic
+from schemas.users import UserSimple
 from schemas.groups import (
     GroupCreate, GroupUpdate, GroupRead,
     GroupMemberAdd, GroupMemberRemove, GroupAndUsersRead
@@ -111,7 +111,7 @@ async def get_reviews(
     return avaliacao_return
 
 
-@router.get("/{group_id}/users", response_model=list[UserPublic], status_code=status.HTTP_200_OK)
+@router.get("/{group_id}/users", response_model=list[UserSimple], status_code=status.HTTP_200_OK)
 async def get_group_users(
     group_id: int,
     current_user: User = Depends(require_admin),

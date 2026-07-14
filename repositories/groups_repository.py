@@ -4,7 +4,7 @@ from models.groups import Groups, GroupsAndUsers
 from models.users import User
 from schemas.groups import GroupCreate, GroupUpdate
 from .user_repository import UserRepository
-from schemas.users import UserPublic
+from schemas.users import UserSimple
 
 class GroupsRepository:
     def __init__(self, session: Session):
@@ -147,7 +147,7 @@ class GroupsRepository:
         users = []
         
         for member in members:
-            users.append(UserPublic(**users_repository.get_user_by_id(member.user_id).model_dump()))
+            users.append(UserSimple(**users_repository.get_user_by_id(member.user_id).model_dump()))
         if not members:
             return []
         return users

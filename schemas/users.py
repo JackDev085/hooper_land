@@ -57,6 +57,19 @@ class UserPublic(SQLModel):
     weigth: float | None = None
     heigth: float | None = None
 
+class UserSimple(SQLModel):
+    """Dados simples de outros usuários (sem informações pessoais sensíveis como email, telefone, peso, altura)"""
+    username: str
+    name: str
+    role: str = "user"
+    instagram: str | None = None
+    description: str | None = None
+    premium: bool = False
+    streak_count: int = 0
+    last_workout_at: str | None = None
+    sex: str | None = None
+    position: str | None = None
+
 class UserRanking(SQLModel):
     """Dados mínimos para ranking público (sem dados pessoais sensíveis)"""
     username: str
