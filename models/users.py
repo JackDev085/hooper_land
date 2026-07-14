@@ -1,6 +1,6 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -18,6 +18,17 @@ class User(SQLModel, table=True):
     updated_at: str|None= Field(default=None)
     premium: bool | None = Field(default=False)
     password_hash: str
+
+    sex: str | None = Field(default=None)
+    position: str | None = Field(default=None)
+    birth_date: str | None = Field(default=None)
+    phone: str | None = Field(default=None)
+    weigth: float | None = Field(default=None)
+    heigth: float | None = Field(default=None)
+
+    reviews: List["Reviews"] = Relationship(back_populates="user_obj")
+    groups: List["GroupsAndUsers"] = Relationship(back_populates="users")
+
 
 class WorkoutLog(SQLModel, table=True):
     __tablename__ = "workout_logs"

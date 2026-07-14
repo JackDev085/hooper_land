@@ -58,7 +58,23 @@ class WorkoutService:
     def complete_workout(self, workout_id: int, current_user: User) -> dict:
         workout = self.workout_repository.get_workout_by_id(workout_id)
         if not workout:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Treino não encontrado!")
+            if workout_id == 999:
+                workout = Workouts(
+                    id=999,
+                    name="Treino de Tomada de Decisão Cognitiva",
+                    desc="Treinamento neurocognitivo com comandos de voz.",
+                    duration="Variável",
+                    category="Neurocognitivo",
+                    slug="treino-tomada-decisao-cognitiva",
+                    premium=True,
+                    created_at=str(datetime.now()),
+                    updated_at=str(datetime.now())
+                )
+                self.session.add(workout)
+                self.session.commit()
+                self.session.refresh(workout)
+            else:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Treino não encontrado!")
 
         # Registra o log de conclusão
         log = WorkoutLog(user_id=current_user.id, workout_id=workout_id)

@@ -99,3 +99,19 @@ def test_complete_workout_streak_logic(session: Session):
     res2 = workout_service.complete_workout(workout.id, user)
     assert res2["streak_count"] == 6
     assert res2["last_workout_at"] == today_str
+
+def test_complete_workout_neuro_cognition_dynamic_creation(session: Session):
+    workout_service = WorkoutService(session)
+    user = User(username="usernc", name="User NC", email="usernc@example.com", password_hash="hash")
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    
+    # Workout 999 does not exist in DB yet
+    res = workout_service.complete_workout(999, user)
+    assert res["streak_count"] == 1
+    
+    # Verify it was created dynamically
+    workout = workout_service.get_workout_by_id(999)
+    assert workout is not None
+    assert workout.name == "Treino de Tomada de Decisão Cognitiva"

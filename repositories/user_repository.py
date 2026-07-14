@@ -1,7 +1,8 @@
 from sqlmodel import Session, select
 from models.users import User
 from schemas.users import UserUpdate
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
 import logging
 
 class UserRepository:
@@ -45,6 +46,18 @@ class UserRepository:
             db_user.description = user_update.description
         if user_update.instagram is not None:
             db_user.instagram = user_update.instagram
+        if user_update.sex is not None:
+            db_user.sex = user_update.sex
+        if user_update.position is not None:
+            db_user.position = user_update.position
+        if user_update.birth_date is not None:
+            db_user.birth_date = user_update.birth_date
+        if user_update.phone is not None:
+            db_user.phone = user_update.phone
+        if user_update.weigth is not None:
+            db_user.weigth = user_update.weigth
+        if user_update.heigth is not None:
+            db_user.heigth = user_update.heigth
         
         db_user.updated_at = str(datetime.now())
         try:
@@ -67,7 +80,24 @@ class UserRepository:
             self.session.rollback()
             raise e
 
+    def clean_broken_streaks(self):
+        tz_fortaleza = timezone(timedelta(hours=-3))
+        today_str = datetime.now(tz_fortaleza).strftime("%Y-%m-%d")
+        yesterday_str = (datetime.now(tz_fortaleza) - timedelta(days=1)).strftime("%Y-%m-%d")
+        
+        statement = select(User).where(User.streak_count > 0)
+        users = self.session.exec(statement).all()
+        updated = False
+        for user in users:
+            if not user.last_workout_at or (user.last_workout_at != today_str and user.last_workout_at != yesterday_str):
+                user.streak_count = 0
+                self.session.add(user)
+                updated = True
+        if updated:
+            self.session.commit()
+
     def get_ranking(self, limit: int = 10) -> list[User]:
+        self.clean_broken_streaks()
         statement = select(User).where(User.streak_count > 0).order_by(User.streak_count.desc()).limit(limit)
         return self.session.exec(statement).all()
 

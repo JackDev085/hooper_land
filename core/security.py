@@ -19,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 router = APIRouter()
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)],session: Session= Depends(get_session)):
-    logging.info(f"Token: {token}")
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -36,6 +36,19 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)],session
     user = session.exec(select(User).where(User.username == token_data.username)).first()
     if user is None:
         raise credentials_exception
+        
+    # Reset current user's streak count if broken
+    if user.streak_count > 0:
+        from datetime import timezone, timedelta
+        tz_fortaleza = timezone(timedelta(hours=-3))
+        today_str = datetime.now(tz_fortaleza).strftime("%Y-%m-%d")
+        yesterday_str = (datetime.now(tz_fortaleza) - timedelta(days=1)).strftime("%Y-%m-%d")
+        if not user.last_workout_at or (user.last_workout_at != today_str and user.last_workout_at != yesterday_str):
+            user.streak_count = 0
+            session.add(user)
+            session.commit()
+            session.refresh(user)
+            
     return user
 
 # funcao para saber se o usuario esta ativo
@@ -92,6 +105,6 @@ def verify_user(user:UserCreate,session: Session)->bool:
         raise HTTPException(status_code=400, detail="Email inválido")
     if not re.match(pattern_password, user.password):
         raise HTTPException(status_code=400, detail="Senha fora do padrão")
-    print("Usuario validade")
+
     return True
     

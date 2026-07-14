@@ -3,6 +3,12 @@ from models.games import Games
 from models.games_schedules import GamesSchedules
 from models.photos import Photos
 from models.users import User, WorkoutLog
+from models.groups import Groups, GroupsAndUsers
+from models.review import Reviews
+from models.push_subscription import PushSubscriptions
+from models.athlete_evolution import Competition, DailyJournal, GameStats, Goal
+from models.exercises import Exercises
+from models.workouts import Workouts
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy import text
@@ -22,17 +28,6 @@ else:
 
 def create_db_and_tables(engine):
     SQLModel.metadata.create_all(engine)
-    
-    # Migração tolerante a erros para adicionar colunas de streak se não existirem
-    with engine.begin() as connection:
-        try:
-            connection.execute(text("ALTER TABLE users ADD COLUMN streak_count INTEGER DEFAULT 0"))
-        except Exception:
-            pass
-        try:
-            connection.execute(text("ALTER TABLE users ADD COLUMN last_workout_at VARCHAR"))
-        except Exception:
-            pass
 
 def get_session():
     with Session(engine) as session:

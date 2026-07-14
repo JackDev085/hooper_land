@@ -50,12 +50,30 @@ class UserPublic(SQLModel):
     premium: bool = False
     streak_count: int = 0
     last_workout_at: str | None = None
+    sex: str | None = None
+    position: str | None = None
+    birth_date: str | None = None
+    phone: str | None = None
+    weigth: float | None = None
+    heigth: float | None = None
+
+class UserRanking(SQLModel):
+    """Dados mínimos para ranking público (sem dados pessoais sensíveis)"""
+    username: str
+    name: str
+    streak_count: int = 0
 
 class UserUpdate(SQLModel):
     """Modelo para atualizar informações do usuário"""
     name: str | None = None
     description: str | None = None
     instagram: str | None = None
+    sex: str | None = None
+    position: str | None = None
+    birth_date: str | None = None
+    phone: str | None = None
+    weigth: float | None = None
+    heigth: float | None = None
 
 class UserAdminUpdate(SQLModel):
     """Modelo para atualizar informações administrativas do usuário pelo admin"""

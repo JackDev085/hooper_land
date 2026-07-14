@@ -13,15 +13,21 @@ class UserService:
         self.user_repository = UserRepository(session)
 
     def login_for_access_token(self, form_data) -> dict:
-        user_in_db = self.user_repository.get_user_by_username(form_data.username)
+        login_input = form_data.username.strip().lower()
+        
+        # Se contém '@', tenta buscar por email; senão, busca por username
+        if "@" in login_input:
+            user_in_db = self.user_repository.get_user_by_email(login_input)
+        else:
+            user_in_db = self.user_repository.get_user_by_username(login_input)
         
         if not user_in_db:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário ou senha incorretos!")
         if not pwd_context.verify(form_data.password, user_in_db.password_hash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário ou senha incorretos!")
 
-        # Gerar o token JWT
-        access_token = create_access_token(data={"sub": form_data.username})
+        # Gerar o token JWT (sempre usando o username como subject)
+        access_token = create_access_token(data={"sub": user_in_db.username})
         return {"access_token": access_token, "token_type": "bearer"}
 
     def register_user(self, user_create: UserCreate) -> User:
